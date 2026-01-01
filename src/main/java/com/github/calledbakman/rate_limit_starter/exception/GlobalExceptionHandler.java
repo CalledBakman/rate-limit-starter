@@ -26,7 +26,7 @@ public class GlobalExceptionHandler {
                 e.getMessage()
         );
 
-        logger.warn("CLIENT RATE LIMIT EXCEEDED | TimeStamp: {} | ErrorCode: {} | Path: {} | Retry: {} seconds | Details: {}",
+        logger.warn("CLIENT RATE LIMIT EXCEEDED | TimeStamp: {} | ErrorCode: {} | Path: {} | Retry: After {} seconds | Details: {}",
                 errorDetail.getTimeStamp(),
                 errorDetail.getErrorCode(),
                 errorDetail.getRequestPath(),
@@ -83,6 +83,25 @@ public class GlobalExceptionHandler {
         HttpHeaders header = new HttpHeaders();
         header.set("RETRY-AT", String.valueOf(e.getRetryAt()));
 
-        return new ResponseEntity<>(errorDetail, header, HttpStatus.TOO_MANY_REQUESTS);
+        return new ResponseEntity<>(errorDetail, header, HttpStatus.SERVICE_UNAVAILABLE);
+    }
+
+    @ExceptionHandler(NoHttpRequestException.class)
+    public ResponseEntity<ErrorDetail> noHttpRequestExceptionHandler(NoHttpRequestException e, WebRequest webRequest){
+        ErrorDetail errorDetail = new ErrorDetail(
+                LocalDateTime.now(),
+                webRequest.getContextPath(),
+                "500 INTERNAL SERVER ERROR",
+                null,
+                e.getMessage()
+        );
+
+        logger.warn("SERVICE UNAVAILABLE | TimeStamp: {} | ErrorCode: {} | Path: {} | Details: {}",
+                errorDetail.getTimeStamp(),
+                errorDetail.getErrorCode(),
+                errorDetail.getRequestPath(),
+                errorDetail.getMessage());
+
+        return new ResponseEntity<>(errorDetail, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
