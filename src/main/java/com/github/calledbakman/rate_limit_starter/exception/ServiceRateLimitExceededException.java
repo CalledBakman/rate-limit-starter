@@ -2,8 +2,6 @@ package com.github.calledbakman.rate_limit_starter.exception;
 
 import lombok.Getter;
 
-import java.time.LocalDateTime;
-
 @Getter
 public class ServiceRateLimitExceededException extends RuntimeException {
     private final long retryAfter;
